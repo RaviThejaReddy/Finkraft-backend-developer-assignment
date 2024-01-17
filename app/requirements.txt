@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-PyMongo
+Flask-JWT-Extended
+mysqlclient
+flask_bcrypt
+jsonschema

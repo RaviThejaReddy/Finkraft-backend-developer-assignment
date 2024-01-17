@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  # SQL Database for User Table
+  sql_db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root_password
+      MYSQL_DATABASE: product_catalog
+      MYSQL_USER: db_user
+      MYSQL_PASSWORD: db_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
+
+  # NoSQL Database for Product Table
+  nosql_db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
+  # RESTful API Service
+  api:
+    build: .
+    ports:
+      - "6000:6000"
+    depends_on:
+      - sql_db
+      - nosql_db
+    environment:
+      SQLALCHEMY_DATABASE_URI: "mysql://db_user:db_password@sql_db/product_catalog"
+      MONGO_URI: "mongodb://nosql_db:27017/product_catalog"
+      JWT_SECRET_KEY: "your_jwt_secret_key"  # Change this to a secure random key
+    volumes:
+      - ./app:/app:rw
